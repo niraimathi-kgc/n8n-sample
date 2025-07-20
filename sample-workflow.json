@@ -1,0 +1,542 @@
+{
+  "name": "sample-workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        -80
+      ],
+      "id": "f2dbf490-763f-45ff-bd23-c72dbe917fd4",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://devops.com/feed/",
+        "options": {
+          "ignoreSSL": false
+        }
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -368,
+        -112
+      ],
+      "id": "47cae5de-982e-4b9d-ac01-473bd9f28da6",
+      "name": "RSS Read",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -560,
+        128
+      ],
+      "id": "ae7065af-88ab-45c5-85c4-55dea07d1460",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "=Hey, Here is what you need to know today!!\n\nAuthor: {{ $json.creator }}\n\nTitle: {{ $json.title }}\n\ncontent: {{ $json.contentSnippet }}\n\nLink: {{ $json.link }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        288,
+        -112
+      ],
+      "id": "3704901f-d29e-456e-818e-2fd1d60baa33",
+      "name": "Discord",
+      "webhookId": "d3be12c3-6bcc-4919-81bb-7db5f1cf41a2",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "C2fVW2PsZTYW3FC1",
+          "name": "Discord Webhook account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -112
+      ],
+      "id": "126b5356-9b92-49b0-9faf-ac94f07b2833",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "847713c7-8f49-45f5-9e61-b777cdb91b88",
+              "name": "creator",
+              "value": "={{ $json.creator }}",
+              "type": "string"
+            },
+            {
+              "id": "3365ed7a-e006-4b86-b709-430ada5ccb9c",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "e89e676f-d2fa-4f9a-8116-53c65881b2f4",
+              "name": "pubDate",
+              "value": "={{ $json.pubDate }}",
+              "type": "string"
+            },
+            {
+              "id": "0e77b516-f6d8-464c-aade-2f25e6a9b655",
+              "name": "contentSnippet",
+              "value": "={{ $json.contentSnippet }}",
+              "type": "string"
+            },
+            {
+              "id": "39e66289-b797-46ea-a5bd-46b9cddc6233",
+              "name": "link",
+              "value": "={{ $json.link }}",
+              "type": "string"
+            },
+            {
+              "id": "2bc4fd99-ce8f-4d2c-8886-e3868b116e97",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        64,
+        -112
+      ],
+      "id": "5d2a9396-3299-4fed-ac56-d24f728b1930",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fromEmail": "test@example.com",
+        "toEmail": "chittenigiribabu347@gmail.com",
+        "subject": "What you need to know today on DevOps",
+        "html": "=<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n    <title>Email Content</title>\n    <style>\n      body {\n        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n        margin: 0;\n        padding: 0;\n        background-color: #f4f6f9;\n        color: #333;\n      }\n      .email-container {\n        max-width: 700px;\n        margin: 40px auto;\n        background: #ffffff;\n        border-radius: 10px;\n        overflow: hidden;\n        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);\n      }\n      .header {\n        background: #3f51b5;\n        color: white;\n        padding: 20px;\n        text-align: center;\n      }\n      .header h1 {\n        margin: 0;\n        font-size: 24px;\n      }\n      .meta {\n        padding: 20px;\n        font-size: 14px;\n        color: #555;\n        background: #f1f3f6;\n        border-bottom: 1px solid #e0e0e0;\n      }\n      .meta div {\n        margin-bottom: 6px;\n      }\n      .content {\n        padding: 30px 20px;\n        font-size: 16px;\n        line-height: 1.6;\n      }\n      .footer {\n        text-align: center;\n        padding: 15px;\n        font-size: 13px;\n        color: #888;\n        background: #f1f3f6;\n      }\n      @media only screen and (max-width: 600px) {\n        .email-container {\n          margin: 20px;\n        }\n        .content, .meta {\n          padding: 20px 15px;\n        }\n      }\n    </style>\n  </head>\n  <body>\n    <div class=\"email-container\">\n      <div class=\"header\">\n        <h1>{{ $('Edit Fields').item.json.title }}</h1>\n      </div>\n      <div class=\"meta\">\n        <div><strong>Author:</strong> {{ $('Edit Fields').item.json.creator }}</div>\n        <div><strong>Published:</strong> {{ $('Edit Fields').item.json.pubDate }}</div>\n      </div>\n      <div class=\"content\">\n        {{ $('Edit Fields').item.json.content }}\n      </div>\n      <div class=\"footer\">\n        This email was generated automatically via n8n.\n      </div>\n    </div>\n  </body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        608,
+        -80
+      ],
+      "id": "33a856af-1e6d-400e-8e96-f035c2c8b729",
+      "name": "Send email",
+      "webhookId": "48442fa3-57e8-41c2-a3a7-9c03c68371e5",
+      "credentials": {
+        "smtp": {
+          "id": "gaeVXcsGU6fLzTTN",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "RSS Read": [
+      {
+        "json": {
+          "creator": "Mike Vizard",
+          "title": "GitLab Preps Platform for Building and Managing AI Agents for DevOps Teams",
+          "link": "https://devops.com/gitlab-preps-platform-for-building-and-managing-ai-agents-for-devops-teams/?utm_source=rss&utm_medium=rss&utm_campaign=gitlab-preps-platform-for-building-and-managing-ai-agents-for-devops-teams",
+          "pubDate": "Fri, 18 Jul 2025 20:47:13 +0000",
+          "dc:creator": "Mike Vizard",
+          "content": "<div><img width=\"770\" height=\"330\" src=\"https://devops.com/wp-content/uploads/2025/06/AI-image-1.jpg\" class=\"attachment-large size-large wp-post-image\" alt=\"\" style=\"margin-bottom: 0px;\" decoding=\"async\" srcset=\"https://devops.com/wp-content/uploads/2025/06/AI-image-1.jpg 770w, https://devops.com/wp-content/uploads/2025/06/AI-image-1-290x124.jpg 290w, https://devops.com/wp-content/uploads/2025/06/AI-image-1-360x154.jpg 360w, https://devops.com/wp-content/uploads/2025/06/AI-image-1-400x171.jpg 400w\" sizes=\"(max-width: 770px) 100vw, 770px\" /></div><img width=\"150\" height=\"150\" src=\"https://devops.com/wp-content/uploads/2025/06/AI-image-1-150x150.jpg\" class=\"attachment-thumbnail size-thumbnail wp-post-image\" alt=\"\" decoding=\"async\" />GitLab this week made available a public beta of a platform for building, managing and orchestrating artificial intelligence (AI) agents that have been trained to automate a range of DevOps tasks and workflows. Emilio Salvador, vice president of strategy and developer relations for GitLab, said the GitLab Duo Agent Platform will enable DevOps teams to [&#8230;]",
+          "contentSnippet": "GitLab this week made available a public beta of a platform for building, managing and orchestrating artificial intelligence (AI) agents that have been trained to automate a range of DevOps tasks and workflows. Emilio Salvador, vice president of strategy and developer relations for GitLab, said the GitLab Duo Agent Platform will enable DevOps teams to […]",
+          "guid": "https://devops.com/?p=178049",
+          "categories": [
+            "AI",
+            "Blogs",
+            "Features",
+            "Social - Facebook",
+            "Social - LinkedIn",
+            "Social - X",
+            "ai",
+            "devops",
+            "gitlab",
+            "sdlc"
+          ],
+          "isoDate": "2025-07-18T20:47:13.000Z"
+        }
+      },
+      {
+        "json": {
+          "creator": "Mike Vizard",
+          "title": "Is Generative AI Replacing Junior Developers?",
+          "link": "https://devops.com/is-generative-ai-replacing-junior-developers/?utm_source=rss&utm_medium=rss&utm_campaign=is-generative-ai-replacing-junior-developers",
+          "pubDate": "Fri, 18 Jul 2025 15:32:51 +0000",
+          "dc:creator": "Mike Vizard",
+          "content": "<div><img width=\"770\" height=\"330\" src=\"https://devops.com/wp-content/uploads/2025/06/AI-model.jpg\" class=\"attachment-large size-large wp-post-image\" alt=\"\" style=\"margin-bottom: 0px;\" decoding=\"async\" srcset=\"https://devops.com/wp-content/uploads/2025/06/AI-model.jpg 770w, https://devops.com/wp-content/uploads/2025/06/AI-model-290x124.jpg 290w, https://devops.com/wp-content/uploads/2025/06/AI-model-360x154.jpg 360w, https://devops.com/wp-content/uploads/2025/06/AI-model-400x171.jpg 400w\" sizes=\"(max-width: 770px) 100vw, 770px\" /></div><img width=\"150\" height=\"150\" src=\"https://devops.com/wp-content/uploads/2025/06/AI-model-150x150.jpg\" class=\"attachment-thumbnail size-thumbnail wp-post-image\" alt=\"\" decoding=\"async\" />Generative AI tools aren’t just autocomplete for code—they’re reshaping the very first rung on the engineering career ladder. Host Mike Vizard asks Juan Salinas, VP of business development at Jalasoft, and software engineer Rolando Lora whether entry‑level developer jobs are about to disappear. Salinas is blunt: the routine, low‑risk tickets that once taught newcomers the ropes [&#8230;]",
+          "contentSnippet": "Generative AI tools aren’t just autocomplete for code—they’re reshaping the very first rung on the engineering career ladder. Host Mike Vizard asks Juan Salinas, VP of business development at Jalasoft, and software engineer Rolando Lora whether entry‑level developer jobs are about to disappear. Salinas is blunt: the routine, low‑risk tickets that once taught newcomers the ropes […]",
+          "guid": "https://devops.com/?p=178047",
+          "categories": [
+            "Video Interviews",
+            "agentic AI",
+            "ai",
+            "Jalasoft",
+            "software engineering"
+          ],
+          "isoDate": "2025-07-18T15:32:51.000Z"
+        }
+      },
+      {
+        "json": {
+          "creator": "Alex Martins",
+          "title": "Meet the Hybrid Tester: The Future of QA in the Age of AI",
+          "link": "https://devops.com/meet-the-hybrid-tester-the-future-of-qa-in-the-age-of-ai/?utm_source=rss&utm_medium=rss&utm_campaign=meet-the-hybrid-tester-the-future-of-qa-in-the-age-of-ai",
+          "pubDate": "Fri, 18 Jul 2025 10:52:05 +0000",
+          "dc:creator": "Alex Martins",
+          "content": "<div><img width=\"764\" height=\"330\" src=\"https://devops.com/wp-content/uploads/2020/09/testing.jpg\" class=\"attachment-large size-large wp-post-image\" alt=\"testers, QA, outdated, test, data, esting, objective-Based, tInstana\" style=\"margin-bottom: 0px;\" decoding=\"async\" srcset=\"https://devops.com/wp-content/uploads/2020/09/testing.jpg 764w, https://devops.com/wp-content/uploads/2020/09/testing-290x125.jpg 290w, https://devops.com/wp-content/uploads/2020/09/testing-150x65.jpg 150w, https://devops.com/wp-content/uploads/2020/09/testing-500x216.jpg 500w\" sizes=\"(max-width: 764px) 100vw, 764px\" /></div><img width=\"150\" height=\"150\" src=\"https://devops.com/wp-content/uploads/2020/09/testing-150x150.jpg\" class=\"attachment-thumbnail size-thumbnail wp-post-image\" alt=\"testers, QA, outdated, test, data, esting, objective-Based, tInstana\" decoding=\"async\" srcset=\"https://devops.com/wp-content/uploads/2020/09/testing-150x150.jpg 150w, https://devops.com/wp-content/uploads/2020/09/testing-50x50.jpg 50w, https://devops.com/wp-content/uploads/2020/09/testing-266x266.jpg 266w\" sizes=\"(max-width: 150px) 100vw, 150px\" />Hybrid testers transform QA from a reactive function into a strategic engine for speed, resilience and user trust. ",
+          "contentSnippet": "Hybrid testers transform QA from a reactive function into a strategic engine for speed, resilience and user trust.",
+          "guid": "https://devops.com/?p=178041",
+          "categories": [
+            "AI",
+            "Blogs",
+            "Business of DevOps",
+            "Contributed Content",
+            "Social - Facebook",
+            "Social - LinkedIn",
+            "Social - X",
+            "Age of AI",
+            "AI-native Testing",
+            "Future of QA",
+            "Hybrid Tester",
+            "QA Maturity Curve",
+            "Transform QA"
+          ],
+          "isoDate": "2025-07-18T10:52:05.000Z"
+        }
+      },
+      {
+        "json": {
+          "creator": "Saqib Jan",
+          "title": "What Happens When AI Starts Writing Your APIs?",
+          "link": "https://devops.com/what-happens-when-ai-starts-writing-your-apis/?utm_source=rss&utm_medium=rss&utm_campaign=what-happens-when-ai-starts-writing-your-apis",
+          "pubDate": "Fri, 18 Jul 2025 10:24:30 +0000",
+          "dc:creator": "Saqib Jan",
+          "content": "<div><img width=\"769\" height=\"330\" src=\"https://devops.com/wp-content/uploads/2021/12/APIadoption.jpg\" class=\"attachment-large size-large wp-post-image\" alt=\"APIs, AI, api sprawl, Postman, APIs, engineering, API-first, strategy. API, Sideko, APIs, API, security, Sonar, vulnerabilities, API, APIs, developers, development, management, tools, API monetization, stack, platform, APIs API Security Summit -- API security -- cybersecurity - Application Programming Interfaces\" style=\"margin-bottom: 0px;\" decoding=\"async\" srcset=\"https://devops.com/wp-content/uploads/2021/12/APIadoption.jpg 769w, https://devops.com/wp-content/uploads/2021/12/APIadoption-290x124.jpg 290w, https://devops.com/wp-content/uploads/2021/12/APIadoption-360x154.jpg 360w, https://devops.com/wp-content/uploads/2021/12/APIadoption-400x172.jpg 400w\" sizes=\"(max-width: 769px) 100vw, 769px\" /></div><img width=\"150\" height=\"150\" src=\"https://devops.com/wp-content/uploads/2021/12/APIadoption-150x150.jpg\" class=\"attachment-thumbnail size-thumbnail wp-post-image\" alt=\"APIs, AI, api sprawl, Postman, APIs, engineering, API-first, strategy. API, Sideko, APIs, API, security, Sonar, vulnerabilities, API, APIs, developers, development, management, tools, API monetization, stack, platform, APIs API Security Summit -- API security -- cybersecurity - Application Programming Interfaces\" decoding=\"async\" />The leaders who recognize that governing their APIs is governing their AI will be the ones who innovate responsibly and build a lasting competitive advantage. ",
+          "contentSnippet": "The leaders who recognize that governing their APIs is governing their AI will be the ones who innovate responsibly and build a lasting competitive advantage.",
+          "guid": "https://devops.com/?p=178037",
+          "categories": [
+            "AI",
+            "Blogs",
+            "Contributed Content",
+            "Social - Facebook",
+            "Social - LinkedIn",
+            "Social - X",
+            "ai",
+            "APIs",
+            "devops"
+          ],
+          "isoDate": "2025-07-18T10:24:30.000Z"
+        }
+      },
+      {
+        "json": {
+          "creator": "Mike Vizard",
+          "title": "Centreon Extends Monitoring Reach into Observability Realm",
+          "link": "https://devops.com/centreon-extends-monitoring-reach-into-observability-realm/?utm_source=rss&utm_medium=rss&utm_campaign=centreon-extends-monitoring-reach-into-observability-realm",
+          "pubDate": "Thu, 17 Jul 2025 18:26:18 +0000",
+          "dc:creator": "Mike Vizard",
+          "content": "<div><img width=\"766\" height=\"330\" src=\"https://devops.com/wp-content/uploads/2020/12/application-monitoring.jpg\" class=\"attachment-large size-large wp-post-image\" alt=\"\" style=\"margin-bottom: 0px;\" decoding=\"async\" srcset=\"https://devops.com/wp-content/uploads/2020/12/application-monitoring.jpg 766w, https://devops.com/wp-content/uploads/2020/12/application-monitoring-290x125.jpg 290w, https://devops.com/wp-content/uploads/2020/12/application-monitoring-150x65.jpg 150w, https://devops.com/wp-content/uploads/2020/12/application-monitoring-500x215.jpg 500w\" sizes=\"(max-width: 766px) 100vw, 766px\" /></div><img width=\"150\" height=\"150\" src=\"https://devops.com/wp-content/uploads/2020/12/application-monitoring-150x150.jpg\" class=\"attachment-thumbnail size-thumbnail wp-post-image\" alt=\"\" decoding=\"async\" srcset=\"https://devops.com/wp-content/uploads/2020/12/application-monitoring-150x150.jpg 150w, https://devops.com/wp-content/uploads/2020/12/application-monitoring-50x50.jpg 50w, https://devops.com/wp-content/uploads/2020/12/application-monitoring-266x266.jpg 266w\" sizes=\"(max-width: 150px) 100vw, 150px\" />Centreon this week generally made available an open source agent for monitoring IT and operational technology (OT) environments that incorporates the open source OpenTelemetry agent for instrumenting applications that is being advanced under the auspices of the Cloud Native Computing Foundation (CNCF). Raphaël Chauvel, chief product officer at Centreon, said now that the Centreon Monitoring [&#8230;]",
+          "contentSnippet": "Centreon this week generally made available an open source agent for monitoring IT and operational technology (OT) environments that incorporates the open source OpenTelemetry agent for instrumenting applications that is being advanced under the auspices of the Cloud Native Computing Foundation (CNCF). Raphaël Chauvel, chief product officer at Centreon, said now that the Centreon Monitoring […]",
+          "guid": "https://devops.com/?p=178031",
+          "categories": [
+            "Blogs",
+            "Features",
+            "Observability, Monitoring and Analytics",
+            "Social - Facebook",
+            "Social - LinkedIn",
+            "Social - X",
+            "Centreon",
+            "devops",
+            "it",
+            "monitoring",
+            "observability"
+          ],
+          "isoDate": "2025-07-17T18:26:18.000Z"
+        }
+      },
+      {
+        "json": {
+          "creator": "Tom Smith",
+          "title": "Beyond Code Generation: How Asimov is Transforming Engineering Team Collaboration",
+          "link": "https://devops.com/beyond-code-generation-how-asimov-is-transforming-engineering-team-collaboration/?utm_source=rss&utm_medium=rss&utm_campaign=beyond-code-generation-how-asimov-is-transforming-engineering-team-collaboration",
+          "pubDate": "Thu, 17 Jul 2025 14:21:17 +0000",
+          "dc:creator": "Tom Smith",
+          "content": "<div><img width=\"770\" height=\"330\" src=\"https://devops.com/wp-content/uploads/2020/11/Accelerate-Digital-Transformation-with-Low-Code.jpg\" class=\"attachment-large size-large wp-post-image\" alt=\"code, coding, reflection, AWS, AI, Imandra, code, moderne, ai agent, AI, applicarions, source code, tools, coding, Google, Jules, GAI coding, GitHub, JFrog, source code, Flox open source coding Coder Accelerate Digital Transformation with Low-Code\" style=\"margin-bottom: 0px;\" decoding=\"async\" srcset=\"https://devops.com/wp-content/uploads/2020/11/Accelerate-Digital-Transformation-with-Low-Code.jpg 770w, https://devops.com/wp-content/uploads/2020/11/Accelerate-Digital-Transformation-with-Low-Code-290x124.jpg 290w, https://devops.com/wp-content/uploads/2020/11/Accelerate-Digital-Transformation-with-Low-Code-150x64.jpg 150w, https://devops.com/wp-content/uploads/2020/11/Accelerate-Digital-Transformation-with-Low-Code-500x214.jpg 500w\" sizes=\"(max-width: 770px) 100vw, 770px\" /></div><img width=\"150\" height=\"150\" src=\"https://devops.com/wp-content/uploads/2020/11/Accelerate-Digital-Transformation-with-Low-Code-150x150.jpg\" class=\"attachment-thumbnail size-thumbnail wp-post-image\" alt=\"code, coding, reflection, AWS, AI, Imandra, code, moderne, ai agent, AI, applicarions, source code, tools, coding, Google, Jules, GAI coding, GitHub, JFrog, source code, Flox open source coding Coder Accelerate Digital Transformation with Low-Code\" decoding=\"async\" srcset=\"https://devops.com/wp-content/uploads/2020/11/Accelerate-Digital-Transformation-with-Low-Code-150x150.jpg 150w, https://devops.com/wp-content/uploads/2020/11/Accelerate-Digital-Transformation-with-Low-Code-50x50.jpg 50w, https://devops.com/wp-content/uploads/2020/11/Accelerate-Digital-Transformation-with-Low-Code-266x266.jpg 266w\" sizes=\"(max-width: 150px) 100vw, 150px\" />Reflection AI's Asimov revolutionizes engineering teams by focusing on code comprehension over generation, capturing tribal knowledge and context.",
+          "contentSnippet": "Reflection AI's Asimov revolutionizes engineering teams by focusing on code comprehension over generation, capturing tribal knowledge and context.",
+          "guid": "https://devops.com/?p=178027",
+          "categories": [
+            "AI",
+            "Blogs",
+            "Business of DevOps",
+            "Features",
+            "News",
+            "Social - Facebook",
+            "Social - LinkedIn",
+            "Social - X",
+            "ai",
+            "AI coding tools",
+            "Code Generation",
+            "devops"
+          ],
+          "isoDate": "2025-07-17T14:21:17.000Z"
+        }
+      },
+      {
+        "json": {
+          "creator": "Alexander Williams",
+          "title": "Essential Soft Skills for DevOps Professionals in the AI Age",
+          "link": "https://devops.com/essential-soft-skills-for-devops-professionals-in-the-ai-age/?utm_source=rss&utm_medium=rss&utm_campaign=essential-soft-skills-for-devops-professionals-in-the-ai-age",
+          "pubDate": "Thu, 17 Jul 2025 08:39:13 +0000",
+          "dc:creator": "Alexander Williams",
+          "content": "<div><img width=\"770\" height=\"330\" src=\"https://devops.com/wp-content/uploads/2021/01/TechStrong-TV_-DevOps-Skills-with-OpsCompass.jpg\" class=\"attachment-large size-large wp-post-image\" alt=\"soft skills, devops, TechStrong TV_ DevOps Skills with OpsCompass\" style=\"margin-bottom: 0px;\" decoding=\"async\" srcset=\"https://devops.com/wp-content/uploads/2021/01/TechStrong-TV_-DevOps-Skills-with-OpsCompass.jpg 770w, https://devops.com/wp-content/uploads/2021/01/TechStrong-TV_-DevOps-Skills-with-OpsCompass-290x124.jpg 290w, https://devops.com/wp-content/uploads/2021/01/TechStrong-TV_-DevOps-Skills-with-OpsCompass-150x64.jpg 150w, https://devops.com/wp-content/uploads/2021/01/TechStrong-TV_-DevOps-Skills-with-OpsCompass-500x214.jpg 500w\" sizes=\"(max-width: 770px) 100vw, 770px\" /></div><img width=\"150\" height=\"150\" src=\"https://devops.com/wp-content/uploads/2021/01/TechStrong-TV_-DevOps-Skills-with-OpsCompass-150x150.jpg\" class=\"attachment-thumbnail size-thumbnail wp-post-image\" alt=\"soft skills, devops, TechStrong TV_ DevOps Skills with OpsCompass\" decoding=\"async\" srcset=\"https://devops.com/wp-content/uploads/2021/01/TechStrong-TV_-DevOps-Skills-with-OpsCompass-150x150.jpg 150w, https://devops.com/wp-content/uploads/2021/01/TechStrong-TV_-DevOps-Skills-with-OpsCompass-50x50.jpg 50w, https://devops.com/wp-content/uploads/2021/01/TechStrong-TV_-DevOps-Skills-with-OpsCompass-266x266.jpg 266w\" sizes=\"(max-width: 150px) 100vw, 150px\" />Technical chops may get your foot in the door, but soft skills are what keep you relevant in the AI-powered DevOps world.",
+          "contentSnippet": "Technical chops may get your foot in the door, but soft skills are what keep you relevant in the AI-powered DevOps world.",
+          "guid": "https://devops.com/?p=178022",
+          "categories": [
+            "Blogs",
+            "Business of DevOps",
+            "Contributed Content",
+            "DevOps Culture",
+            "DevOps Practice",
+            "Social - Facebook",
+            "Social - LinkedIn",
+            "Social - X",
+            "devops",
+            "soft skills"
+          ],
+          "isoDate": "2025-07-17T08:39:13.000Z"
+        }
+      },
+      {
+        "json": {
+          "creator": "Ganesh Datta",
+          "title": "DevEx is at a Crossroads",
+          "link": "https://devops.com/devex-is-at-a-crossroads/?utm_source=rss&utm_medium=rss&utm_campaign=devex-is-at-a-crossroads",
+          "pubDate": "Thu, 17 Jul 2025 08:16:39 +0000",
+          "dc:creator": "Ganesh Datta",
+          "content": "<div><img width=\"770\" height=\"330\" src=\"https://devops.com/wp-content/uploads/2021/02/Developer-Teams.jpg\" class=\"attachment-large size-large wp-post-image\" alt=\"DevEx, business, technical, leadership, teams, devops, small, team, product, devops,DevEx, CI/CD pipelines, developer, experience, Backstage, developer, GitHub productivity Roadie DevX developer experience DPE open source team lead Agile hybrid developer GitLab DevRel developer GitHub BDD CircleCI Rust developer\" style=\"margin-bottom: 0px;\" decoding=\"async\" srcset=\"https://devops.com/wp-content/uploads/2021/02/Developer-Teams.jpg 770w, https://devops.com/wp-content/uploads/2021/02/Developer-Teams-290x124.jpg 290w\" sizes=\"(max-width: 770px) 100vw, 770px\" /></div><img width=\"150\" height=\"150\" src=\"https://devops.com/wp-content/uploads/2021/02/Developer-Teams-150x150.jpg\" class=\"attachment-thumbnail size-thumbnail wp-post-image\" alt=\"DevEx, business, technical, leadership, teams, devops, small, team, product, devops,DevEx, CI/CD pipelines, developer, experience, Backstage, developer, GitHub productivity Roadie DevX developer experience DPE open source team lead Agile hybrid developer GitLab DevRel developer GitHub BDD CircleCI Rust developer\" decoding=\"async\" srcset=\"https://devops.com/wp-content/uploads/2021/02/Developer-Teams-150x150.jpg 150w, https://devops.com/wp-content/uploads/2021/02/Developer-Teams-266x266.jpg 266w\" sizes=\"(max-width: 150px) 100vw, 150px\" />The key is treating DevEx roadmaps as living documents that evolve with business needs, not set-and-forget infrastructure projects.",
+          "contentSnippet": "The key is treating DevEx roadmaps as living documents that evolve with business needs, not set-and-forget infrastructure projects.",
+          "guid": "https://devops.com/?p=178018",
+          "categories": [
+            "Blogs",
+            "Business of DevOps",
+            "Contributed Content",
+            "DevOps Culture",
+            "Social - Facebook",
+            "Social - LinkedIn",
+            "Social - X",
+            "devex",
+            "leadership",
+            "metrics",
+            "sentiment"
+          ],
+          "isoDate": "2025-07-17T08:16:39.000Z"
+        }
+      },
+      {
+        "json": {
+          "creator": "Jyostna Seelam",
+          "title": "The Leadership Mindset for Sustainable DevOps Cost Optimization",
+          "link": "https://devops.com/the-leadership-mindset-for-sustainable-devops-cost-optimization/?utm_source=rss&utm_medium=rss&utm_campaign=the-leadership-mindset-for-sustainable-devops-cost-optimization",
+          "pubDate": "Thu, 17 Jul 2025 07:27:03 +0000",
+          "dc:creator": "Jyostna Seelam",
+          "content": "<div><img width=\"770\" height=\"330\" src=\"https://devops.com/wp-content/uploads/2020/04/Multi-Cloud-Cost-Optimization.jpg\" class=\"attachment-large size-large wp-post-image\" alt=\"cost, finance, finops, cloud, cost, cloud costs, AWS, engineering, AWS multi-cloud challenges, multi-cloud, costs, CloudBolt FinOps Grafana observability Vega Cloud cost multi-cloud FinOps governance cost-efficient Multi-Cloud Cost Optimization\" style=\"margin-bottom: 0px;\" decoding=\"async\" srcset=\"https://devops.com/wp-content/uploads/2020/04/Multi-Cloud-Cost-Optimization.jpg 770w, https://devops.com/wp-content/uploads/2020/04/Multi-Cloud-Cost-Optimization-290x124.jpg 290w, https://devops.com/wp-content/uploads/2020/04/Multi-Cloud-Cost-Optimization-150x64.jpg 150w, https://devops.com/wp-content/uploads/2020/04/Multi-Cloud-Cost-Optimization-500x214.jpg 500w\" sizes=\"(max-width: 770px) 100vw, 770px\" /></div><img width=\"150\" height=\"150\" src=\"https://devops.com/wp-content/uploads/2020/04/Multi-Cloud-Cost-Optimization-150x150.jpg\" class=\"attachment-thumbnail size-thumbnail wp-post-image\" alt=\"cost, finance, finops, cloud, cost, cloud costs, AWS, engineering, AWS multi-cloud challenges, multi-cloud, costs, CloudBolt FinOps Grafana observability Vega Cloud cost multi-cloud FinOps governance cost-efficient Multi-Cloud Cost Optimization\" decoding=\"async\" srcset=\"https://devops.com/wp-content/uploads/2020/04/Multi-Cloud-Cost-Optimization-150x150.jpg 150w, https://devops.com/wp-content/uploads/2020/04/Multi-Cloud-Cost-Optimization-50x50.jpg 50w, https://devops.com/wp-content/uploads/2020/04/Multi-Cloud-Cost-Optimization-266x266.jpg 266w\" sizes=\"(max-width: 150px) 100vw, 150px\" />From seeing costs as an external burden imposed by finance to recognizing them as an integral signal of engineering health.",
+          "contentSnippet": "From seeing costs as an external burden imposed by finance to recognizing them as an integral signal of engineering health.",
+          "guid": "https://devops.com/?p=178012",
+          "categories": [
+            "Blogs",
+            "Business of DevOps",
+            "Cloud Management",
+            "Contributed Content",
+            "DevOps in the Cloud",
+            "Social - Facebook",
+            "Social - LinkedIn",
+            "Social - X",
+            "cloud cost management",
+            "Cost transparency in DevOps",
+            "DevOps cost optimization",
+            "Engineering leadership",
+            "Sustainable DevOps practices"
+          ],
+          "isoDate": "2025-07-17T07:27:03.000Z"
+        }
+      },
+      {
+        "json": {
+          "creator": "Adrian Bridgwater",
+          "title": "GitGuardian Humanizes Non-Human Identity Controls Inside Developer Workflows",
+          "link": "https://devops.com/gitguardian-humanizes-non-human-identity-controls/?utm_source=rss&utm_medium=rss&utm_campaign=gitguardian-humanizes-non-human-identity-controls",
+          "pubDate": "Wed, 16 Jul 2025 18:00:37 +0000",
+          "dc:creator": "Adrian Bridgwater",
+          "content": "<div><img width=\"770\" height=\"330\" src=\"https://devops.com/wp-content/uploads/2024/05/AI-Robot-Sorting-Through-Records.jpg\" class=\"attachment-large size-large wp-post-image\" alt=\"software development, AI, AI, agents, DevOps, Generative AI, API, ai robot sorting through records.\" style=\"margin-bottom: 0px;\" decoding=\"async\" srcset=\"https://devops.com/wp-content/uploads/2024/05/AI-Robot-Sorting-Through-Records.jpg 770w, https://devops.com/wp-content/uploads/2024/05/AI-Robot-Sorting-Through-Records-290x124.jpg 290w, https://devops.com/wp-content/uploads/2024/05/AI-Robot-Sorting-Through-Records-360x154.jpg 360w, https://devops.com/wp-content/uploads/2024/05/AI-Robot-Sorting-Through-Records-400x171.jpg 400w\" sizes=\"(max-width: 770px) 100vw, 770px\" /></div><img width=\"150\" height=\"150\" src=\"https://devops.com/wp-content/uploads/2024/05/AI-Robot-Sorting-Through-Records-150x150.jpg\" class=\"attachment-thumbnail size-thumbnail wp-post-image\" alt=\"software development, AI, AI, agents, DevOps, Generative AI, API, ai robot sorting through records.\" decoding=\"async\" />GitGuardian says its MCP server enables DevOps teams to detect, respond to and remediate security incidents as code is being written.",
+          "contentSnippet": "GitGuardian says its MCP server enables DevOps teams to detect, respond to and remediate security incidents as code is being written.",
+          "guid": "https://devops.com/?p=177994",
+          "categories": [
+            "Blogs",
+            "Features",
+            "News",
+            "Social - Facebook",
+            "Social - LinkedIn",
+            "Social - X",
+            "ai",
+            "application development",
+            "developers",
+            "devops",
+            "GitGuardian",
+            "MCP Server",
+            "software development",
+            "testing"
+          ],
+          "isoDate": "2025-07-16T18:00:37.000Z"
+        }
+      }
+    ],
+    "Limit": [
+      {
+        "json": {
+          "creator": "Mike Vizard",
+          "title": "GitLab Preps Platform for Building and Managing AI Agents for DevOps Teams",
+          "link": "https://devops.com/gitlab-preps-platform-for-building-and-managing-ai-agents-for-devops-teams/?utm_source=rss&utm_medium=rss&utm_campaign=gitlab-preps-platform-for-building-and-managing-ai-agents-for-devops-teams",
+          "pubDate": "Fri, 18 Jul 2025 20:47:13 +0000",
+          "dc:creator": "Mike Vizard",
+          "content": "<div><img width=\"770\" height=\"330\" src=\"https://devops.com/wp-content/uploads/2025/06/AI-image-1.jpg\" class=\"attachment-large size-large wp-post-image\" alt=\"\" style=\"margin-bottom: 0px;\" decoding=\"async\" srcset=\"https://devops.com/wp-content/uploads/2025/06/AI-image-1.jpg 770w, https://devops.com/wp-content/uploads/2025/06/AI-image-1-290x124.jpg 290w, https://devops.com/wp-content/uploads/2025/06/AI-image-1-360x154.jpg 360w, https://devops.com/wp-content/uploads/2025/06/AI-image-1-400x171.jpg 400w\" sizes=\"(max-width: 770px) 100vw, 770px\" /></div><img width=\"150\" height=\"150\" src=\"https://devops.com/wp-content/uploads/2025/06/AI-image-1-150x150.jpg\" class=\"attachment-thumbnail size-thumbnail wp-post-image\" alt=\"\" decoding=\"async\" />GitLab this week made available a public beta of a platform for building, managing and orchestrating artificial intelligence (AI) agents that have been trained to automate a range of DevOps tasks and workflows. Emilio Salvador, vice president of strategy and developer relations for GitLab, said the GitLab Duo Agent Platform will enable DevOps teams to [&#8230;]",
+          "contentSnippet": "GitLab this week made available a public beta of a platform for building, managing and orchestrating artificial intelligence (AI) agents that have been trained to automate a range of DevOps tasks and workflows. Emilio Salvador, vice president of strategy and developer relations for GitLab, said the GitLab Duo Agent Platform will enable DevOps teams to […]",
+          "guid": "https://devops.com/?p=178049",
+          "categories": [
+            "AI",
+            "Blogs",
+            "Features",
+            "Social - Facebook",
+            "Social - LinkedIn",
+            "Social - X",
+            "ai",
+            "devops",
+            "gitlab",
+            "sdlc"
+          ],
+          "isoDate": "2025-07-18T20:47:13.000Z"
+        }
+      }
+    ],
+    "Edit Fields": [
+      {
+        "json": {
+          "creator": "Mike Vizard",
+          "title": "GitLab Preps Platform for Building and Managing AI Agents for DevOps Teams",
+          "pubDate": "Fri, 18 Jul 2025 20:47:13 +0000",
+          "contentSnippet": "GitLab this week made available a public beta of a platform for building, managing and orchestrating artificial intelligence (AI) agents that have been trained to automate a range of DevOps tasks and workflows. Emilio Salvador, vice president of strategy and developer relations for GitLab, said the GitLab Duo Agent Platform will enable DevOps teams to […]",
+          "link": "https://devops.com/gitlab-preps-platform-for-building-and-managing-ai-agents-for-devops-teams/?utm_source=rss&utm_medium=rss&utm_campaign=gitlab-preps-platform-for-building-and-managing-ai-agents-for-devops-teams",
+          "content": "<div><img width=\"770\" height=\"330\" src=\"https://devops.com/wp-content/uploads/2025/06/AI-image-1.jpg\" class=\"attachment-large size-large wp-post-image\" alt=\"\" style=\"margin-bottom: 0px;\" decoding=\"async\" srcset=\"https://devops.com/wp-content/uploads/2025/06/AI-image-1.jpg 770w, https://devops.com/wp-content/uploads/2025/06/AI-image-1-290x124.jpg 290w, https://devops.com/wp-content/uploads/2025/06/AI-image-1-360x154.jpg 360w, https://devops.com/wp-content/uploads/2025/06/AI-image-1-400x171.jpg 400w\" sizes=\"(max-width: 770px) 100vw, 770px\" /></div><img width=\"150\" height=\"150\" src=\"https://devops.com/wp-content/uploads/2025/06/AI-image-1-150x150.jpg\" class=\"attachment-thumbnail size-thumbnail wp-post-image\" alt=\"\" decoding=\"async\" />GitLab this week made available a public beta of a platform for building, managing and orchestrating artificial intelligence (AI) agents that have been trained to automate a range of DevOps tasks and workflows. Emilio Salvador, vice president of strategy and developer relations for GitLab, said the GitLab Duo Agent Platform will enable DevOps teams to [&#8230;]"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discord": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ad8195ad-88d1-4c8a-8e23-a0e3bfd1453b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "db5b85996c2163b24c6c42c7a61ac3102ab878db2bb605f223b924d21bb73485"
+  },
+  "id": "KOVMaUTNoqbKeFEK",
+  "tags": []
+}
