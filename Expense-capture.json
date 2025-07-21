@@ -1,0 +1,310 @@
+{
+  "name": "Expense-capture",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        },
+        "filters": {
+          "q": "Transaction alert for your ICICI Bank account",
+          "sender": "customercare@icicibank.com"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -512,
+        -80
+      ],
+      "id": "e0b584ad-ae5c-4824-b0e1-974aa94e922b",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1Tk1Nw4DXaesPTpk",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a financial data extraction assistant specialized in analyzing transaction emails and SMS notifications. Your task is to read the provided mail/SMS snippet and extract key transaction information for personal expense tracking.\n\nInput: {{ $json.snippet }}\n\n### CRITICAL CATEGORIZATION RULES:\n\nIf the transaction involves “INDIAN CLEARING CORP”, ALWAYS categorize as “Investment” (this is for SIP/mutual funds).\n\nIf the text mentions BSE, NSE, mutual fund names, AMC, categorize as “Investment”.\n\nIf the text mentions SIP, ELSS, EQUITY, DEBT funds, categorize as “Investment”.\n\nIf it mentions salary, credited by employer, monthly income, categorize as “Income”.\n\nIf it contains payment to a shop, merchant, or service, categorize as “Expenses”.\n\nIf it mentions NEFT/IMPS/RTGS/UPI to known contact or bank, and is not for shopping or bills, categorize as “Transfer”.\n\nIf it references FD/RD creation, deposit into savings, categorize as “Savings”.\n\nIf it mentions loan EMI, credit card bill, insurance premium, categorize as “Expenses”.\n\nIf unclear or ambiguous, categorize as “Not specified”.\n\n\n### Instructions:\n\nCarefully analyze the snippet to determine if it is a financial transaction notification.\n\nCheck for investment keywords FIRST before categorizing.\n\nExtract only the essential information needed for expense tracking.\n\nIf any information is unclear or missing, mark it as \"Not specified\".\n\n### Required Output Format (JSON only):\n\n{\n\"date\": \"YYYY-MM-DD format or 'Not specified'\",\n\"Received or Paid\": \"Received/Paid/Not specified\",\n\"amount\": \"numeric value only, no currency symbols\",\n\"Bank Name\": \"bank/UPI app name or 'Not specified'\",\n\"To/From\": \"merchant/person/purpose in 10 words max\",\n\"Description\": \"brief transaction summary in 50 words\",\n\"Category\": \"Investment/Expenses/Savings/Income/Transfer\",\n\"Snippet\": \"original text from input\"\n}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -288,
+        -80
+      ],
+      "id": "d8f832a8-0cb4-4027-aa55-e298d4bf3182",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "content": "You are a financial data extraction assistant specialized in analyzing transaction emails and SMS notifications. Your task is to read the provided mail/SMS snippet and extract key transaction information for personal expense tracking.\n\nInput: {{ $json.snippet }}\n\n### CRITICAL CATEGORIZATION RULES:\n\nIf the transaction involves “INDIAN CLEARING CORP”, ALWAYS categorize as “Investment” (this is for SIP/mutual funds).\n\nIf the text mentions BSE, NSE, mutual fund names, AMC, categorize as “Investment”.\n\nIf the text mentions SIP, ELSS, EQUITY, DEBT funds, categorize as “Investment”.\n\n### Instructions:\n\nCarefully analyze the snippet to determine if it is a financial transaction notification.\n\nCheck for investment keywords FIRST before categorizing.\n\nExtract only the essential information needed for expense tracking.\n\nIf any information is unclear or missing, mark it as \"Not specified\".\n\n### Required Output Format (JSON only):\n\n{\n\"date\": \"YYYY-MM-DD format or 'Not specified'\",\n\"Received or Paid\": \"Received/Paid/Not specified\",\n\"amount\": \"numeric value only, no currency symbols\",\n\"Bank Name\": \"bank/UPI app name or 'Not specified'\",\n\"To/From\": \"merchant/person/purpose in 10 words max\",\n\"Description\": \"brief transaction summary in 50 words\",\n\"Category\": \"Investment/Expenses/Savings/Income/Transfer\",\n\"Snippet\": \"original text from input\"\n}",
+        "height": 304,
+        "width": 288
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -176,
+        -448
+      ],
+      "typeVersion": 1,
+      "id": "75334a28-9999-4fb2-98fd-d6c301c69788",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-chat:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        144
+      ],
+      "id": "19bfe5c8-0de5-46fd-81b9-714516600506",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "K3JaQ8qaJIzcjP7N",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "schemaType": "fromJson",
+        "jsonSchemaExample": "{\n\"amount\": \"number\",\n\"currency\": \"string\",\n\"date\": \"date\",\n\"towards\": \"string\",\n\"description\": \"string\",\n\"source_language\": \"string\",\n\"target_language\": \"string\",\n\"vendor_name\": \"string\",\n\"word_count\": \"number\",\n\"category\": \"Translation Services\"\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        112,
+        -80
+      ],
+      "id": "6e532bb9-a9fd-47f2-a3b5-3a50e63d54b5",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "content": "{\n\"amount\": \"number\",\n\"currency\": \"string\",\n\"date\": \"date\",\n\"description\": \"string\",\n\"source_language\": \"string\",\n\"target_language\": \"string\",\n\"vendor_name\": \"string\",\n\"word_count\": \"number\",\n\"category\": \"Translation Services\"\n}",
+        "height": 304,
+        "width": 352
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        224,
+        -448
+      ],
+      "typeVersion": 1,
+      "id": "a05837c3-3ab2-47f6-9796-2814f5ac73c6",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-chat:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        208,
+        144
+      ],
+      "id": "5041c60a-2520-47d6-9f67-c030d98bf332",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "K3JaQ8qaJIzcjP7N",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1ziSZLGsSVhhS2Xd2Ld8p_bLDxRCpCfiJapFCdqnrnNg",
+          "mode": "list",
+          "cachedResultName": "Log-Expenses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ziSZLGsSVhhS2Xd2Ld8p_bLDxRCpCfiJapFCdqnrnNg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "n8n-Expense-Capture",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ziSZLGsSVhhS2Xd2Ld8p_bLDxRCpCfiJapFCdqnrnNg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json.output.date }}",
+            "Amount": "={{ $json.output.currency }}: {{ $json.output.amount }}",
+            "description": "={{ $json.output.description }}",
+            "vendor": "={{ $json.output.vendor_name }}",
+            "category": "={{ $json.output.category }}"
+          },
+          "matchingColumns": [
+            "Date"
+          ],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Amount",
+              "displayName": "Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "vendor",
+              "displayName": "vendor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        512,
+        -80
+      ],
+      "id": "a2aa4dd0-c67a-4b70-b445-403aada6eb31",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ayx1b0sKyV28xgEk",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2320a92a-c500-43c4-a77a-13a6ce93736c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "db5b85996c2163b24c6c42c7a61ac3102ab878db2bb605f223b924d21bb73485"
+  },
+  "id": "qga11wI2NcADCnqg",
+  "tags": []
+}
